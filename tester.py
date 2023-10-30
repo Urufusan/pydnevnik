@@ -1,4 +1,6 @@
 from pprint import pprint
 if __name__ == "__main__":
-    from pydnevnik import glavni
-    pprint(glavni.main())
+    import pydnevnik
+    # pydnevnik.mainclass
+    # pydnevnik.helper
+    pprint(pydnevnik.main())
