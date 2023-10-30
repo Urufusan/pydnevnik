@@ -1,5 +1,5 @@
 import requests
-from dnevnikhelperlib import get_csrf, login_creds_parser, all_grades_data_fetcher, grades_exporter
+from .dnevnikhelperlib import get_csrf, login_creds_parser, all_grades_data_fetcher, grades_exporter
 #import pickle
 #from pprint import pprint
 
@@ -15,7 +15,7 @@ def force_logout(t_d_headders : dict, t_d_old_cookies : dict):
 
 
 def main(t_id_gradebook_class : int|str = 0, bl_print_markdown = False, BL_DEBUG_MODE : bool = False) -> list[dict]:
-    t_id_gradebook_class = ''.join(filter(str.isnumeric, t_id_gradebook_class))
+    t_id_gradebook_class = ''.join(filter(str.isnumeric, str(t_id_gradebook_class)))
     #force_logout({}, {}, {})
     carnet_login_data = login_creds_parser(debugprint=BL_DEBUG_MODE)
     s = requests.session()
