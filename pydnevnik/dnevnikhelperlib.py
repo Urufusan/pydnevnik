@@ -68,7 +68,7 @@ def get_csrf(r_login_page_object: requests.Response) -> str:
 def filepathprovider(wantedfilepath) -> str:
     return os.path.join(os.path.dirname(os.path.realpath('__file__')), wantedfilepath)
 
-def login_creds_parser(debugprint = False) -> list[str]:
+def login_creds_parser(debugprint : bool = False) -> list[str]:
     path_secrets_file = filepathprovider('.logininfo.secret')
     t_b_can_read_file = os.path.isfile(path_secrets_file) and os.access(path_secrets_file, os.R_OK)
     with open(path_secrets_file, "r" if t_b_can_read_file else "a+") as f:
