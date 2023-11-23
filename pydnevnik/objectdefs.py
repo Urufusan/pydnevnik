@@ -8,6 +8,7 @@ class EDnevnik:
 
     def logout_user(self):
         # Placeholder method to logout the user session
+        # Run logout if not logged out (session object still exists), otherwise ignore.
         print("Logged out the user session")
 
     def authenticate(self):
