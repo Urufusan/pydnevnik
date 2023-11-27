@@ -1,5 +1,6 @@
 import atexit
-
+import glavni
+# glavni.
 class EDnevnik:
     def __init__(self, username, password):
         self.username = username

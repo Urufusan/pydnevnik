@@ -1,4 +1,5 @@
 from pydnevnik import glavni as mainclass
-from pydnevnik import dnevnikhelperlib as helper
-from pydnevnik.glavni import main
+from pydnevnik import dnevnikhelperlib as helperlib
+from pydnevnik import sessionfuncs as sesfuncs
+# from pydnevnik.glavni import main
 

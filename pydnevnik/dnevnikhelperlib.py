@@ -5,7 +5,26 @@ import pickle
 import requests
 import os
 import subprocess
+from collections import defaultdict
+import math
 
+def round_half_up(n:float, decimals=0) -> float:
+    multiplier = 10**decimals
+    return math.floor(n * multiplier + 0.5) / multiplier
+
+def course_selection_parser(s_all_courses_html_content : str) -> tuple[dict]:
+    soup = BeautifulSoup(s_all_courses_html_content, "html.parser")
+    dom : etree._Element = etree.HTML(str(soup))
+    x_xpath_all_courses = dom.xpath("/html/body/div[1]/div[3]/div/div[@class='class-menu-vertical' or @class='class-menu-vertical past-schoolyear']/div")
+    t_l_courses_data = []
+    for x_course in x_xpath_all_courses:
+        t_l_courses_data.append({'course-id': x_course.get('data-action-id', None),
+                                 'course-name': x_course[0][0][0].text,
+                                 'course-year': x_course[0][0][1].text,
+                                 'course-school-name': x_course[0][1][0][0].text,
+                                 'course-avg-grade': x_course.find(".//li[@class='gray overall-grade']")[1].text.strip()
+                                 })
+    return tuple(t_l_courses_data) # , x_xpath_all_courses
 
 def span_text_fetch(t_xpath_element : etree._Element, t_s_default_string_if_not_found : str = "(Prazno)") -> str:
         #print((xpath_element))
@@ -60,11 +79,6 @@ def ppdb_dump(given_data, s_filepath: str) -> None:
     with open(s_filepath, 'wb') as handle:
         pickle.dump(given_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-def get_csrf(r_login_page_object: requests.Response) -> str:
-    soup = BeautifulSoup(r_login_page_object.text, "html.parser")
-    csrf_token = soup.find("input", {"name": "csrf_token"})
-    return csrf_token.attrs["value"]
-
 def filepathprovider(wantedfilepath) -> str:
     return os.path.join(os.path.dirname(os.path.realpath('__file__')), wantedfilepath)
 
@@ -101,7 +115,7 @@ def batprint(text : str, lang : str = "json"):
     # Print the return code
     #print("\nReturn Code:", return_code)
 
-def grades_exporter(t_l_grades: list[dict]) -> str:
+def textual_grades_exporter(t_l_grades: list[dict]) -> str:
     t_s_formatted_text = ""
     t_d_classes = {}
     
@@ -145,6 +159,34 @@ Bilješka:
             t_i_for_loop_counter += 1
     return t_s_formatted_text
 
+def change_current_course_from_coursebook(t_course_id : int|str, t_requests_session : requests.Session) -> None:
+    t_requests_session.get(f"https://ocjene.skole.hr/class_action/{t_course_id}/course")
+
+def calculate_avg_grade_from_all_grades(t_grades_list : dict):
+    # Create a dictionary to store total grades and counts for each subject
+    subject_grades = defaultdict(lambda: {'total': 0, 'count': 0})
+
+    # Iterate through the list of dictionaries
+    for entry in t_grades_list:
+        subject = entry['class']
+        try:
+            grade = float(entry['grade'])  # Convert grade to a numerical value
+            # Update total grades and counts for each subject
+            subject_grades[subject]['total'] += grade
+            subject_grades[subject]['count'] += 1
+        except ValueError:
+            pass
+
+
+    # Calculate average grades for each subject
+    average_grades = {}
+    for subject, values in subject_grades.items():
+        if values['count'] > 0:
+            average_grades[subject] = values['total'] / values['count']
+        else:
+            average_grades[subject] = 0  # If no grades found for a subject, set average to 0
+
+    return average_grades
 
 if __name__ == "__main__":
     #moj_data = ppdb_read("./logindump.ppdb")

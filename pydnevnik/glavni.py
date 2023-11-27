@@ -1,10 +1,10 @@
 import requests
-from .dnevnikhelperlib import get_csrf, login_creds_parser, all_grades_data_fetcher, grades_exporter
+from .dnevnikhelperlib import all_grades_data_fetcher, textual_grades_exporter, change_current_course_from_coursebook
+from .sessionfuncs import create_edn_session, edn_logout
 #import pickle
 #from pprint import pprint
 
-def change_class_gradebook(t_grade_id : int|str, t_requests_session : requests.Session) -> None:
-    t_requests_session.get(f"https://ocjene.skole.hr/class_action/{t_grade_id}/course")
+
 
 def force_logout(t_d_headders : dict, t_d_old_cookies : dict):
     #carnet_login_data = login_creds_parser(True)
@@ -17,31 +17,20 @@ def force_logout(t_d_headders : dict, t_d_old_cookies : dict):
 def main(t_id_gradebook_class : int|str = 0, bl_print_markdown : bool = False, t_l_login_data : list[str, str] = ["email", "password"], BL_DEBUG_MODE : bool = False) -> list[dict]:
     t_id_gradebook_class = ''.join(filter(str.isnumeric, str(t_id_gradebook_class)))
     #force_logout({}, {}, {})
-    carnet_login_data = login_creds_parser(debugprint=BL_DEBUG_MODE) if t_l_login_data == ["email", "password"] else t_l_login_data
-    s = requests.session()
-    s.headers.update({"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/118.0", "DNT": "1", "Sec-GPC": "1"})
-    glavniobj = s.get("https://ocjene.skole.hr/login",)
+    s = create_edn_session(t_l_login_data, BL_DEBUG_MODE)
 
-    if BL_DEBUG_MODE: print("kolacici:", s.cookies.get_dict())
-    s_csrf_token = get_csrf(glavniobj)
-    if BL_DEBUG_MODE: print("dobiven csrf:", s_csrf_token)
-
-    returnan_post = s.post("https://ocjene.skole.hr/login",
-    data={
-        "username": carnet_login_data[0],
-        "password": carnet_login_data[1],
-        "csrf_token": s_csrf_token,
-    })
-
-    if t_id_gradebook_class: change_class_gradebook(t_id_gradebook_class, s)
+    if t_id_gradebook_class: change_current_course_from_coursebook(t_id_gradebook_class, s)
     s_grade_html_export = s.get("https://ocjene.skole.hr/grade/all").text
     # if BL_DEBUG_MODE: print(s_grade_html_export)
-    s.get("https://ocjene.skole.hr/logout") # Log out nicely to prevent getting blacklisted
+    # s.get("https://ocjene.skole.hr/logout") # Log out nicely to prevent getting blacklisted
+    edn_logout(s)
 
     t_l_processed_data = all_grades_data_fetcher(s_grade_html_export)
     if BL_DEBUG_MODE: print("Class ID:", t_l_processed_data[0])
-    if bl_print_markdown: print(grades_exporter(t_l_processed_data[1]))
+    if bl_print_markdown: print(textual_grades_exporter(t_l_processed_data[1]))
     return t_l_processed_data
+
+
 
     # with open("./gradeallout.html", "w") as filectl:
     #     filectl.write(s_grade_html_export)
