@@ -3,13 +3,15 @@ from .dnevnikhelperlib import all_grades_data_fetcher, change_current_course_fro
 from bs4 import BeautifulSoup
 import atexit
 
+DEBUG = False
+
 def get_csrf(r_login_page_object: requests.Response) -> str:
     soup = BeautifulSoup(r_login_page_object.text, "html.parser")
     csrf_token = soup.find("input", {"name": "csrf_token"})
     return csrf_token.attrs["value"]
 
 def edn_logout(t_edn_session : requests.Session):
-    print("Logging out...")
+    if DEBUG: print("Logging out...")
     t_req_obj = t_edn_session.get("https://ocjene.skole.hr/logout")
     t_req_obj.raise_for_status()
     atexit.unregister(edn_logout)

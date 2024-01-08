@@ -40,11 +40,12 @@ def all_grades_data_fetcher(s_all_grade_html_content : str) -> tuple[int, list[d
     soup = BeautifulSoup(s_all_grade_html_content, "html.parser")
     #print(str(soup))
     dom : etree._Element = etree.HTML(str(soup))
-    t_id_of_grade =                   int(''.join(filter(str.isnumeric,(dom.xpath("/html/body/div[1]/div[3]/div[2]/ul")[0].values()[0]))))
-    x_xpath_dates_path =              dom.xpath("/html/body/div[1]/div[4]/div[2]/div/div[@class='flex-table row' or @class='flex-table row negative']/div[1]")
-    x_xpath_notes_path =              dom.xpath("/html/body/div[1]/div[4]/div[2]/div/div[@class='flex-table row' or @class='flex-table row negative']/div[2]")
-    x_xpath_note_grading_types_path = dom.xpath("/html/body/div[1]/div[4]/div[2]/div/div[@class='flex-table row' or @class='flex-table row negative']/div[3]")
-    x_xpath_note_grades_path =        dom.xpath("/html/body/div[1]/div[4]/div[2]/div/div[@class='flex-table row' or @class='flex-table row negative']/div[4]")
+    t_id_of_grade =                   int(''.join(filter(str.isnumeric,(dom.xpath("/html/body/div[1]/div[3]/ul")[0].values()[0]))))
+    x_xpath_dates_path =              dom.xpath("/html/body/div[1]/div[4]/div[2]/div/div[@class='row' or @class='row negative']/div[1]")
+    x_xpath_notes_path =              dom.xpath("/html/body/div[1]/div[4]/div[2]/div/div[@class='row' or @class='row negative']/div[2]/div[1]")
+    x_xpath_note_grading_types_path = dom.xpath("/html/body/div[1]/div[4]/div[2]/div/div[@class='row' or @class='row negative']/div[2]/div[2]")
+    #                                            /html/body/div[1]/div[4]/div[2]/div/div[                                                           ]/div[2]/div[2]/span
+    x_xpath_note_grades_path =        dom.xpath("/html/body/div[1]/div[4]/div[2]/div/div[@class='row' or @class='row negative']/div[2]/div[3]")
     t_d_temp_locals = locals()
     #pprint(x_dates_path)
     l_compiled_list_of_note_dicts = []

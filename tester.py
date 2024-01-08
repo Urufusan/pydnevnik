@@ -11,5 +11,7 @@ if __name__ == "__main__":
     ses = sesfuncs.create_edn_session(BL_DEBUG_MODE=False)
     # pprint(sesfuncs.return_all_courses_metadata(ses))
     # pprint(sesfuncs.get_all_grades_from_course(ses))
-    pprint(l_int_all_avgs := helperlib.calculate_avg_grade_from_all_grades(sesfuncs.get_all_grades_from_course(ses, 4905791380)))
+    avgtest = sesfuncs.get_all_grades_from_course(ses)
+    # pprint(avgtest)
+    pprint(l_int_all_avgs := helperlib.calculate_avg_grade_from_all_grades(avgtest))
     print("Ukupna:", mean([helperlib.round_half_up(floateee) for floateee in l_int_all_avgs.values()]))
