@@ -10,16 +10,15 @@ def get_csrf(r_login_page_object: requests.Response) -> str:
     csrf_token = soup.find("input", {"name": "csrf_token"})
     return csrf_token.attrs["value"]
 
-def edn_logout(t_edn_session : requests.Session):
+def edn_logout(t_edn_session: requests.Session):
     if DEBUG: print("Logging out...")
     t_req_obj = t_edn_session.get("https://ocjene.skole.hr/logout")
     t_req_obj.raise_for_status()
     atexit.unregister(edn_logout)
     return t_edn_session
 
-def create_edn_session(t_l_login_data : list[str, str] = ["email", "password"], BL_DEBUG_MODE = False):
-    """Create a Requests Session with E-Dnevnik creds
-    """
+def create_edn_session(t_l_login_data: list[str, str] = ["email", "password"], BL_DEBUG_MODE = False):
+    """Create a Requests Session with E-Dnevnik creds"""
     carnet_login_data = login_creds_parser(debugprint=BL_DEBUG_MODE) if t_l_login_data == ["email", "password"] else t_l_login_data
     s = requests.session()
     s.headers.update({"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/118.0", "DNT": "1", "Sec-GPC": "1"})
@@ -39,15 +38,21 @@ def create_edn_session(t_l_login_data : list[str, str] = ["email", "password"], 
     return s
 
 
-def return_all_courses_metadata(req_session : requests.Session):
-    """Returns all courses and all metadata inside earch course
-    """
+def return_all_courses_metadata(req_session: requests.Session):
+    """Returns all courses and all metadata inside each course"""
     s_html_coursesel_page = req_session.get("https://ocjene.skole.hr/class").text
     return course_selection_parser(s_html_coursesel_page)
 
-def get_all_grades_from_course(t_session_obj : requests.Session, t_course_id : int|str = 0):
+def get_all_grades_from_course(t_session_obj: requests.Session, t_course_id : int|str = 0):
     t_course_id = ''.join(filter(str.isnumeric, str(t_course_id)))
     if t_course_id:
         change_current_course_from_coursebook(t_course_id, t_session_obj)
     t_s_grade_html_export = t_session_obj.get("https://ocjene.skole.hr/grade/all").text
     return all_grades_data_fetcher(t_s_grade_html_export)[1]
+
+def get_all_tests_from_course(t_session_obj: requests.Session, t_course_id : int|str = 0):
+    t_course_id = ''.join(filter(str.isnumeric, str(t_course_id)))
+    if t_course_id:
+        change_current_course_from_coursebook(t_course_id, t_session_obj)
+    t_s_ical = t_session_obj.get("https://ocjene.skole.hr/exam/ical").text
+    return t_s_ical

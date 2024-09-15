@@ -12,6 +12,7 @@ if __name__ == "__main__":
     # pprint(sesfuncs.return_all_courses_metadata(ses))
     # pprint(sesfuncs.get_all_grades_from_course(ses))
     avgtest = sesfuncs.get_all_grades_from_course(ses)
+    pprint(avgtest)
     # pprint(avgtest)
     pprint(l_int_all_avgs := helperlib.calculate_avg_grade_from_all_grades(avgtest))
     print("Ukupna:", mean([helperlib.round_half_up(floateee) for floateee in l_int_all_avgs.values()]))

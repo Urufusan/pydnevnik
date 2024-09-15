@@ -21,7 +21,7 @@ setup(
     description = 'A Python library for E-Dnevnik (ocjene.skole.hr)',
     long_description_content_type = "text/markdown",  # If this causes a warning, upgrade your setuptools package
     long_description = long_description,
-    license = "GNU General Public License v3",
+    license = "GNU Affero General Public License v3",
     packages = find_packages(exclude=["test"]),  # Don't include test directory in binary distribution
     install_requires = requirements,
     python_requires='>=3.9',
